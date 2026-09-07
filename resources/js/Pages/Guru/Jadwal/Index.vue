@@ -137,7 +137,6 @@ const submitJadwal = () => {
                             <tr class="border-b border-indigo-50 bg-slate-50/50 text-[11px] font-black uppercase tracking-wider text-slate-400">
                                 <th class="py-4 px-6">Siswa</th>
                                 <th class="py-4 px-6">No. Siswa / NIS</th>
-                                <th class="py-4 px-6">Jadwal</th>
                                 <th class="py-4 px-6">Wali & Kontak</th>
                                 <th class="py-4 px-6">Status Akun</th>
                                 <th class="py-4 px-6 text-right">Aksi</th>
@@ -187,32 +186,6 @@ const submitJadwal = () => {
                                             <span class="font-bold text-slate-700">{{ siswa.nis }}</span>
                                         </div>
                                     </div>
-                                </td>
-
-                                <!-- Jadwal Bimbingan (Hari di atas, Jam horizontal menarik di bawah) -->
-                                <td class="py-4 px-6">
-                                    <div v-if="siswa.jadwal && siswa.jadwal.length > 0" class="flex flex-col gap-2">
-                                        <div v-for="j in siswa.jadwal" :key="j.id" class="inline-flex flex-col gap-1">
-                                            <!-- Hari -->
-                                            <div class="inline-flex items-center gap-1.5 text-slate-800">
-                                                <span class="w-2 h-2 rounded-full bg-amber-500 ring-4 ring-amber-100"></span>
-                                                <span class="font-extrabold text-xs tracking-tight text-slate-900">{{ j.hari }}</span>
-                                            </div>
-                                            <!-- Rentang Waktu Horizontal Modern -->
-                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50/90 border border-amber-200/70 text-amber-900 shadow-sm">
-                                                <span class="font-mono text-xs font-bold text-amber-950 bg-white/90 px-1.5 py-0.5 rounded-md shadow-xs border border-amber-200/50">
-                                                    {{ j.jam_mulai ? j.jam_mulai.substring(0, 5) : '00:00' }}
-                                                </span>
-                                                <span class="text-amber-500 font-bold text-[11px]">s/d</span>
-                                                <span class="font-mono text-xs font-bold text-amber-950 bg-white/90 px-1.5 py-0.5 rounded-md shadow-xs border border-amber-200/50">
-                                                    {{ j.jam_selesai ? j.jam_selesai.substring(0, 5) : '00:00' }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <span v-else class="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] text-slate-400 font-semibold bg-slate-50 border border-slate-200/60">
-                                        Belum diatur
-                                    </span>
                                 </td>
 
                                 <!-- Wali & Kontak -->
@@ -276,7 +249,7 @@ const submitJadwal = () => {
                             </tr>
 
                             <tr v-if="!daftar_siswa?.data || daftar_siswa.data.length === 0">
-                                <td colspan="7" class="py-12 text-center text-slate-400">
+                                <td colspan="5" class="py-12 text-center text-slate-400">
                                     <div class="w-12 h-12 mx-auto rounded-full bg-indigo-50 text-indigo-400 flex items-center justify-center mb-2">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

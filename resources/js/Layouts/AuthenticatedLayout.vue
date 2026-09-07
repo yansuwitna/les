@@ -6,7 +6,12 @@ const showingSidebar = ref(false);
 const page = usePage();
 const user = computed(() => page.props.auth?.user || {});
 const userRole = computed(() => user.value?.peran || user.value?.role || 'admin');
-const userName = computed(() => user.value?.nama || user.value?.name || 'Pengguna');
+const userName = computed(() => {
+    if (userRole.value === 'ortu') {
+        return user.value?.nama_wali || 'Wali Murid';
+    }
+    return user.value?.nama || user.value?.name || 'Pengguna';
+});
 const settings = computed(() => page.props.pengaturan || page.props.settings || {});
 const appName = computed(() => settings.value?.nama_les || settings.value?.les_name || 'Les Ceria');
 const appLogo = computed(() => settings.value?.logo_url || null);
@@ -64,19 +69,9 @@ const guruMenus = [
 
 const ortuMenus = [
     {
-        name: 'Dashboard Wali',
+        name: 'Dashboard Pemantauan',
         route: 'ortu.dashboard',
         icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
-    },
-    {
-        name: 'Jadwal Kursus Anak',
-        route: 'ortu.dashboard',
-        icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
-    },
-    {
-        name: 'Kemajuan Belajar',
-        route: 'ortu.dashboard',
-        icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'
     },
     {
         name: 'Ubah Profil',
@@ -260,12 +255,6 @@ const roleBadge = computed(() => {
                 </div>
 
                 <div v-if="userRole !== 'guru'" class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 font-bold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                        <span class="w-2 h-2 -ml-3 rounded-full bg-emerald-500"></span>
-                        <span>Sistem Aktif</span>
-                    </div>
-
                     <Link 
                         :href="route('profile.edit')" 
                         class="flex items-center gap-2 p-1 pl-2 pr-3 rounded-2xl bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-all group"
@@ -276,20 +265,9 @@ const roleBadge = computed(() => {
                             <span v-else class="text-xs font-black text-purple-700">{{ userName.charAt(0).toUpperCase() }}</span>
                         </div>
                         <div class="text-left hidden sm:block">
-                            <span class="block text-xs font-bold text-slate-800 group-hover:text-purple-700">{{ userName }}</span>
+                            <span v-if="userRole !== 'ortu'" class="block text-xs font-bold text-slate-800 group-hover:text-purple-700">{{ userName }}</span>
                             <span class="block text-[9px] font-semibold text-purple-500 uppercase">{{ roleBadge.label }}</span>
                         </div>
-                    </Link>
-
-                    <Link 
-                        href="/" 
-                        target="_blank"
-                        class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-all"
-                    >
-                        <span>Lihat Website</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
                     </Link>
                 </div>
             </header>
