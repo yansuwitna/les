@@ -44,14 +44,14 @@ const formJadwal = useForm({
 const openJadwalModal = (siswa) => {
     selectedSiswa.value = siswa;
     const bimbingan = (siswa.bimbingan && siswa.bimbingan.length > 0) ? siswa.bimbingan[0] : null;
+    const jadwal = (siswa.jadwal && siswa.jadwal.length > 0) ? siswa.jadwal[0] : null;
     formJadwal.siswa_id = siswa.id;
-    if (bimbingan) {
-        selectedBimbinganId.value = bimbingan.id;
-        formJadwal.hari = bimbingan.hari || 'Senin';
-        formJadwal.jam_mulai = bimbingan.jam_mulai ? bimbingan.jam_mulai.substring(0, 5) : '08:00';
-        formJadwal.jam_selesai = bimbingan.jam_selesai ? bimbingan.jam_selesai.substring(0, 5) : '09:30';
+    selectedBimbinganId.value = bimbingan ? bimbingan.id : null;
+    if (jadwal) {
+        formJadwal.hari = jadwal.hari || 'Senin';
+        formJadwal.jam_mulai = jadwal.jam_mulai ? jadwal.jam_mulai.substring(0, 5) : '08:00';
+        formJadwal.jam_selesai = jadwal.jam_selesai ? jadwal.jam_selesai.substring(0, 5) : '09:30';
     } else {
-        selectedBimbinganId.value = null;
         formJadwal.hari = 'Senin';
         formJadwal.jam_mulai = '08:00';
         formJadwal.jam_selesai = '09:30';
@@ -191,21 +191,23 @@ const submitJadwal = () => {
 
                                 <!-- Jadwal Bimbingan (Hari di atas, Jam horizontal menarik di bawah) -->
                                 <td class="py-4 px-6">
-                                    <div v-if="siswa.bimbingan && siswa.bimbingan.length > 0 && siswa.bimbingan[0].hari" class="inline-flex flex-col gap-1.5">
-                                        <!-- Hari -->
-                                        <div class="inline-flex items-center gap-1.5 text-slate-800">
-                                            <span class="w-2 h-2 rounded-full bg-amber-500 ring-4 ring-amber-100"></span>
-                                            <span class="font-extrabold text-xs tracking-tight text-slate-900">{{ siswa.bimbingan[0].hari }}</span>
-                                        </div>
-                                        <!-- Rentang Waktu Horizontal Modern -->
-                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50/90 border border-amber-200/70 text-amber-900 shadow-sm">
-                                            <span class="font-mono text-xs font-bold text-amber-950 bg-white/90 px-1.5 py-0.5 rounded-md shadow-xs border border-amber-200/50">
-                                                {{ siswa.bimbingan[0].jam_mulai ? siswa.bimbingan[0].jam_mulai.substring(0, 5) : '00:00' }}
-                                            </span>
-                                            <span class="text-amber-500 font-bold text-[11px]">s/d</span>
-                                            <span class="font-mono text-xs font-bold text-amber-950 bg-white/90 px-1.5 py-0.5 rounded-md shadow-xs border border-amber-200/50">
-                                                {{ siswa.bimbingan[0].jam_selesai ? siswa.bimbingan[0].jam_selesai.substring(0, 5) : '00:00' }}
-                                            </span>
+                                    <div v-if="siswa.jadwal && siswa.jadwal.length > 0" class="flex flex-col gap-2">
+                                        <div v-for="j in siswa.jadwal" :key="j.id" class="inline-flex flex-col gap-1">
+                                            <!-- Hari -->
+                                            <div class="inline-flex items-center gap-1.5 text-slate-800">
+                                                <span class="w-2 h-2 rounded-full bg-amber-500 ring-4 ring-amber-100"></span>
+                                                <span class="font-extrabold text-xs tracking-tight text-slate-900">{{ j.hari }}</span>
+                                            </div>
+                                            <!-- Rentang Waktu Horizontal Modern -->
+                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50/90 border border-amber-200/70 text-amber-900 shadow-sm">
+                                                <span class="font-mono text-xs font-bold text-amber-950 bg-white/90 px-1.5 py-0.5 rounded-md shadow-xs border border-amber-200/50">
+                                                    {{ j.jam_mulai ? j.jam_mulai.substring(0, 5) : '00:00' }}
+                                                </span>
+                                                <span class="text-amber-500 font-bold text-[11px]">s/d</span>
+                                                <span class="font-mono text-xs font-bold text-amber-950 bg-white/90 px-1.5 py-0.5 rounded-md shadow-xs border border-amber-200/50">
+                                                    {{ j.jam_selesai ? j.jam_selesai.substring(0, 5) : '00:00' }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <span v-else class="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] text-slate-400 font-semibold bg-slate-50 border border-slate-200/60">

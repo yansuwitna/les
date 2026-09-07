@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Jadwal extends Model
 {
-    protected $table = 'bimbingan';
+    protected $table = 'jadwal';
 
     protected $guarded = [];
 
@@ -32,6 +32,11 @@ class Jadwal extends Model
     public function materi()
     {
         return $this->belongsTo(Materi::class, 'materi_id');
+    }
+
+    public function bimbingan()
+    {
+        return $this->belongsTo(Bimbingan::class, 'bimbingan_id');
     }
 
     // Aliases for backward compatibility

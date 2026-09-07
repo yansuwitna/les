@@ -120,4 +120,14 @@ class Guru extends Authenticatable
     {
         return $this;
     }
+
+    public function bimbingan()
+    {
+        return $this->hasMany(Bimbingan::class, 'guru_id');
+    }
+
+    public function jadwal()
+    {
+        return $this->hasMany(Jadwal::class, 'guru_id');
+    }
 }

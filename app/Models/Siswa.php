@@ -147,6 +147,11 @@ class Siswa extends Authenticatable
         return $this->hasMany(Bimbingan::class, 'siswa_id');
     }
 
+    public function jadwal()
+    {
+        return $this->hasMany(Jadwal::class, 'siswa_id');
+    }
+
     public function getParentAttribute()
     {
         return $this->getPenggunaAttribute();

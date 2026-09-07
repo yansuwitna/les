@@ -24,8 +24,8 @@ class DashboardController extends Controller
     {
         $guruId = $this->getGuruId();
 
-        // Ambil jadwal bimbingan aktif milik guru ini dari tabel bimbingan
-        $jadwalHariIni = Bimbingan::with('siswa')
+        // Ambil jadwal bimbingan aktif milik guru ini dari tabel jadwal
+        $jadwalHariIni = Jadwal::with('siswa')
             ->where('guru_id', $guruId)
             ->where('aktif', true)
             ->get();
@@ -41,7 +41,7 @@ class DashboardController extends Controller
             ->get();
 
         $totalSiswa = Bimbingan::where('guru_id', $guruId)->where('aktif', true)->distinct('siswa_id')->count('siswa_id');
-        $totalJadwal = Bimbingan::where('guru_id', $guruId)->where('aktif', true)->count();
+        $totalJadwal = Jadwal::where('guru_id', $guruId)->where('aktif', true)->count();
         $totalTarget = Target::where('guru_id', $guruId)->count();
         $totalKegiatan = Kegiatan::whereHas('target', function ($q) use ($guruId) {
             $q->where('guru_id', $guruId);
@@ -73,13 +73,18 @@ class DashboardController extends Controller
         $guruId = $this->getGuruId();
 
         // Ambil ID siswa unik yang dialokasikan ke guru ini
-        $siswaIds = Jadwal::where('guru_id', $guruId)
+        $siswaIds = Bimbingan::where('guru_id', $guruId)
             ->distinct()
             ->pluck('siswa_id');
 
-        $query = Siswa::with(['bimbingan' => function ($q) use ($guruId) {
-            $q->where('guru_id', $guruId);
-        }])->whereIn('id', $siswaIds);
+        $query = Siswa::with([
+            'bimbingan' => function ($q) use ($guruId) {
+                $q->where('guru_id', $guruId);
+            },
+            'jadwal' => function ($q) use ($guruId) {
+                $q->where('guru_id', $guruId)->orWhereNull('guru_id');
+            }
+        ])->whereIn('id', $siswaIds);
 
         if ($request->filled('cari')) {
             $cari = $request->cari;
@@ -102,7 +107,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    // Update Jadwal Bimbingan Siswa (Hari, Jam Mulai, Jam Selesai)
+    // Update Jadwal Bimbingan Siswa (Tabel Jadwal)
     public function updateJadwalBimbingan(Request $request, $bimbingan = null)
     {
         $guruId = $this->getGuruId();
@@ -127,23 +132,15 @@ class DashboardController extends Controller
         }
 
         if (!$bimbinganModel && $request->filled('siswa_id')) {
-            $bimbinganModel = \App\Models\Bimbingan::where('guru_id', $guruId)
-                ->where('siswa_id', $request->siswa_id)
-                ->first();
+            $bimbinganModel = \App\Models\Bimbingan::firstOrCreate([
+                'guru_id' => $guruId,
+                'siswa_id' => $request->siswa_id,
+            ], [
+                'aktif' => true,
+            ]);
         }
 
         if (!$bimbinganModel) {
-            if ($request->filled('siswa_id')) {
-                $bimbinganModel = \App\Models\Bimbingan::create([
-                    'guru_id' => $guruId,
-                    'siswa_id' => $request->siswa_id,
-                    'hari' => $validated['hari'],
-                    'jam_mulai' => $validated['jam_mulai'],
-                    'jam_selesai' => $validated['jam_selesai'],
-                    'aktif' => true,
-                ]);
-                return redirect()->back()->with('success', 'Jadwal bimbingan siswa berhasil disimpan.');
-            }
             return redirect()->back()->with('error', 'Data bimbingan siswa tidak ditemukan.');
         }
 
@@ -151,11 +148,19 @@ class DashboardController extends Controller
             abort(403, 'Akses tidak diizinkan.');
         }
 
-        $bimbinganModel->update([
-            'hari' => $validated['hari'],
-            'jam_mulai' => $validated['jam_mulai'],
-            'jam_selesai' => $validated['jam_selesai'],
-        ]);
+        \App\Models\Jadwal::updateOrCreate(
+            [
+                'bimbingan_id' => $bimbinganModel->id,
+                'siswa_id' => $bimbinganModel->siswa_id,
+                'guru_id' => $guruId,
+                'hari' => $validated['hari'],
+            ],
+            [
+                'jam_mulai' => $validated['jam_mulai'],
+                'jam_selesai' => $validated['jam_selesai'],
+                'aktif' => true,
+            ]
+        );
 
         return redirect()->back()->with('success', 'Jadwal bimbingan siswa berhasil disimpan.');
     }
